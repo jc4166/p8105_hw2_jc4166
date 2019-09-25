@@ -10,22 +10,34 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-## R Markdown
+## Problem 1
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+The "Mr. Trash Wheel" sheet was read in from the "HealthyHarborWaterWheelTotals2018-7-28.xlsx" Excel file and variable names were cleaned. Rows and columns that did not contain dumpster-specific data were omitted, and for the variable "sports_balls" the number was rounded to the nearest integer, and then converted to an integer variable.
+```{r}
+library(readxl)
+mr_trash_wheel_data = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "Mr. Trash Wheel") %>% 
+  janitor::clean_names() %>%
+  subset(dumpster != "NA") %>%
+  subset(select = -c(x15))
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+Precipitation data for 2017 was read and cleaned, omitting rows without precipitation data and adding a variable "year". 
+```{r}
+library(readxl)
+precipitation_2017_data = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "2017 Precipitation", range = "A2:B14") %>% 
+  janitor::clean_names() %>%
+  subset(total != "NA") %>%
+  mutate(year = "2017")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Precipitation data for 2018 was read and cleaned, omitting rows without precipitation data and adding a variable "year". 
+```{r}
+library(readxl)
+precipitation_2018_data = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "2018 Precipitation", range = "A2:B14") %>% 
+  janitor::clean_names() %>%
+  subset(total != "NA") %>%
+  mutate(year = "2018")
+```
+
+
+The 2017 and 2018 precipitation datasets were then combined, "month" was converted to a character variable.
