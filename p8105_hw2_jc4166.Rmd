@@ -13,15 +13,16 @@ library(tidyverse)
 ## Problem 1
 
 The "Mr. Trash Wheel" sheet was read in from the "HealthyHarborWaterWheelTotals2018-7-28.xlsx" Excel file and variable names were cleaned. Rows and columns that did not contain dumpster-specific data were omitted, and for the variable "sports_balls" the number was rounded to the nearest integer, and then converted to an integer variable.
-```{r}
+```{r eval = FALSE}
 library(readxl)
 mr_trash_wheel_data = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "Mr. Trash Wheel") %>% 
   janitor::clean_names() %>%
   subset(dumpster != "NA") %>%
-  subset(select = -c(x15))
+  subset(select = -c(x15)) %>%
+  mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
 ```
 
-Precipitation data for 2017 and 2018 were read and cleaned, omitting rows without precipitation data and adding a variable "year". Then, the 2017 and 2018 precipitation datasets were then combined, and "month" was converted to a character variable.
+Precipitation data for 2017 and 2018 were read and cleaned, omitting rows without precipitation data and adding a variable "year". Then, the 2017 and 2018 precipitation datasets were combined, and "month" was converted to a character variable.
 ```{r}
 library(readxl)
 precipitation_2017_data = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "2017 Precipitation", range = "A2:B14") %>% 
@@ -35,5 +36,11 @@ precipitation_2018_data = read_excel("./data/HealthyHarborWaterWheelTotals2018-7
   mutate(year = "2018")
 
 precipitation_17_18_combined_data = 
-  left_join(precipitation_2017_data, precipitation_2018_data, by = "month")
+  left_join(precipitation_2017_data, precipitation_2018_data, by = "month") %>%
+  mutate(month = month.name)
 ```
+
+The "precipitation_17_18_combined_data" dataset summarizes precipitation in inches for each month of 2017 and 2018. The data for 2017 is complete as there are entries for each month (`r count(precipitation_2017_data, "total" != "NA")` observations total). The data for 2018 is not complete as several months are missing; there are `r count(precipitation_2018_data, "total" != "NA")` observations total. The total precipitation for available months in 2018 is XXXX inches. The "mr_trash_wheel_data" summarizes the types of objects that are collected by Mr. Trash Wheel. For example, in 2018, XXXX sports balls were collected in total.
+
+## Problem 2
+
