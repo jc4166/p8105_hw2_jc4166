@@ -43,9 +43,9 @@ precipitation_17_18_combined_data =
 The "precipitation_17_18_combined_data" dataset summarizes precipitation in inches for each month of 2017 and 2018. The data for 2017 is complete as there are entries for each month, (`r count(precipitation_2017_data, total != "NA")` observations total). The data for 2018 is not complete as several months are missing; there are `r count(precipitation_2018_data, total != "NA")` observations total. The total precipitation for available months in 2018 is XXXX inches. The "mr_trash_wheel_data" summarizes the types of objects that are collected by Mr. Trash Wheel. For example, in 2018, XXXX sports balls were collected in total.
 
 ## Problem 2
-Data from "pols-month.csv" was read in and cleaned. 
+Data from "pols-month.csv" was read in and cleaned.
 
-```{r}
+```{r eval = FALSE}
 pols_month_data = read_csv(file = "./data/pols-month.csv") %>%
   janitor::clean_names() %>%
   separate(col = mon, into = c("year", "month", "day"), sep = "-") %>%
@@ -53,6 +53,45 @@ pols_month_data = read_csv(file = "./data/pols-month.csv") %>%
   mutate(president = if_else(prez_gop == 1, "gop", "dem")) %>% 
   select(-prez_gop, -prez_dem, -day)
 ```
+
+Data from "snp.csv" was read in and cleaned.
+```{r eval = FALSE}
+snp_data = read_csv(file = "./data/snp.csv") %>% 
+  janitor::clean_names() %>%
+  separate(col = date, into = c("month", "day", "year"), sep = "/") %>% 
+  select("year", "month", "day", "close") %>% 
+  mutate(month = month.name[as.numeric(month)]) %>% 
+  select(-day) %>% 
+  rename(snp_close = close)
+```
+
+Data from "unemployment.csv" was read in and cleaned.
+```{r eval = FALSE}
+unemployment_data = read_csv(file = "./data/unemployment.csv") %>% 
+  janitor::clean_names()
+
+unemployment_data_tidy = 
+  pivot_longer(
+    unemployment_data,
+    jan:dec,
+    names_to = "month",
+    values_to = "percent_unempl") %>% 
+  mutate(month = case_when(
+    month == "jan" ~ "January",
+    month == "feb" ~ "February",
+    month == "mar" ~ "March",
+    month == "apr" ~ "April",
+    month == "may" ~ "May",
+    month == "jun" ~ "June",
+    month == "jul" ~ "July",
+    month == "aug" ~ "August",
+    month == "sep" ~ "September",
+    month == "oct" ~ "October",
+    month == "nov" ~ "November",
+    month == "dec" ~ "December"
+  ))
+```
+
 
 
 
