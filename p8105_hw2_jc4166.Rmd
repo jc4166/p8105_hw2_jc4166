@@ -13,24 +13,25 @@ library(tidyverse)
 ## Problem 1
 
 The "Mr. Trash Wheel" sheet was read in from the "HealthyHarborWaterWheelTotals2018-7-28.xlsx" Excel file and variable names were cleaned. Rows and columns that did not contain dumpster-specific data were omitted, and for the variable "sports_balls" the number was rounded to the nearest integer, and then converted to an integer variable.
+
 ```{r eval = FALSE}
 library(readxl)
-mr_trash_wheel_data = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "Mr. Trash Wheel") %>% 
-  janitor::clean_names() %>%
+mr_trash_wheel_data = read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "Mr. Trash Wheel") %>% 
+  janitor::clean_names() %>% 
   subset(dumpster != "NA") %>%
-  subset(select = -c(x15)) %>%
-  mutate(sports_balls = as.integer(round(sports_balls, digits = 0)))
+  subset(select = -c(x15, x16, x17)) %>%
+  mutate(sports_balls = as.integer(round(sports_balls, digits = 0))
 ```
 
 Precipitation data for 2017 and 2018 were read and cleaned, omitting rows without precipitation data and adding a variable "year". Then, the 2017 and 2018 precipitation datasets were combined, and "month" was converted to a character variable.
 ```{r}
 library(readxl)
-precipitation_2017_data = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "2017 Precipitation", range = "A2:B14") %>% 
+precipitation_2017_data = read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2017 Precipitation", range = "A2:B14") %>% 
   janitor::clean_names() %>%
   subset(total != "NA") %>%
   mutate(year = "2017")
 
-precipitation_2018_data = read_excel("./data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "2018 Precipitation", range = "A2:B14") %>% 
+precipitation_2018_data = read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2018 Precipitation", range = "A2:B14") %>% 
   janitor::clean_names() %>%
   subset(total != "NA") %>%
   mutate(year = "2018")
@@ -117,14 +118,49 @@ baby_names_tidy = read.csv(file = "./data/Popular_Baby_Names.csv") %>%
   mutate(gender = tolower(gender)) %>% 
   mutate(ethnicity = tolower(ethnicity)) %>% 
   mutate(ethnicity = case_when(
-    ethnicity == "asian and pacific islander" ~ "asian and pacific islander",
-    ethnicity == "asian and paci" ~ "asian and pacific islander",
-    ethnicity == "black non hispanic" ~ "black non hispanic",
-    ethnicity == "black non hisp" ~ "black non hispanic",
-    ethnicity == "white non hispanic" ~ "white non hispanic",
-    ethnicity == "white non hisp" ~ "white non hispanic"
-  ))
+    ethnicity == "asian and pacific islander" ~ "Asian and Pacific Islander",
+    ethnicity == "asian and paci" ~ "Asian and Pacific Islander",
+    ethnicity == "black non hispanic" ~ "Black Non-Hispanic",
+    ethnicity == "black non hisp" ~ "Black Non-Hispanic",
+    ethnicity == "white non hispanic" ~ "White Non-Hispanic",
+    ethnicity == "white non hisp" ~ "White Non-Hispanic",
+    ethnicity == "hispanic" ~ "Hispanic"
+  )) %>% 
+  distinct()
 ```
 
 Create a table showing the rank in popularity of the name "Olivia" over time.
+```{r eval = FALSE}
+name_olivia = baby_names_tidy %>% 
+  select(year, ethnicity, name, rank) %>% 
+  filter(name == "olivia")
+```
+To make the above table easier to view, I will "untidy" it for presentation. This table will show the year, and the rank of the name "Olivia" in each ethnicity category.
+```{r eval = FALSE}
+olivia_rank =
+  pivot_wider(
+    name_olivia,
+    names_from = "year",
+    values_from = "rank"
+  ) %>% 
+  select(-name) %>% 
+  select ("ethnicity", "2011", "2012", "2013", "2014", "2015", "2016")
+```
+
+Rank in popularity of male names for white non-hsipanic children in 2016.
+```{r eval = FALSE}
+male_wnh_2016 = baby_names_tidy %>% 
+  filter(
+    year == "2016",
+    gender == "male",
+    ethnicity == "White Non-Hispanic"
+         ) %>% 
+  select(-year, -gender, -ethnicity)
+```
+
+Plot of male_wnh_2016 data.
+```{r eval = FALSE}
+ggplot(male_wnh_2016, aes(x = rank, y = count)) + 
+  geom_point()
+```
 
