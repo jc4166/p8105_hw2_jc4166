@@ -48,6 +48,9 @@ median_2017=
 median_2017_sports_balls = 
   median(pull(median_2017, sports_balls))
 ```
+The "mr_trash_wheel_data" summarizes the types of objects that are collected by Mr. Trash Wheel. The key variables for the Mr. Trash Wheel sheet include the weight (tons), volume (cubic yards), and number of specific items (e.g. plastic bottles and grocery bags). For example, in 2017, `r median_2017_sports_balls` was the median number of sports balls collected.
+
+The "precipitation_17_18_combined_data" dataset summarizes precipitation in inches for each month of 2017 and 2018. The total precipitation for 2017 `r sum(pull(precipitation_2017_data, total))` and for 2018 is `r sum(pull(precipitation_2018_data, total))` inches. 
 
 ## Problem 2
 Data from "pols-month.csv" was read in and cleaned.
